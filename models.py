@@ -96,12 +96,12 @@ def TGA():
   results = Fusion(64 + 16 * 18, 16)(results);
   # NOTE: the following layer make length = length - 2
   results = Fusion(64 + 16 * 20, 16, is_last = True)(results);
-  results = tf.keras.layers.BatchNormalization()(results);
-  results = tf.keras.layers.ReLU()(results);
   reshaped = tf.keras.layers.Lambda(lambda x: tf.reshape(x, (-1, tf.shape(x)[2], tf.shape(x)[3], x.shape[4])))(results);
+  reshaped = tf.keras.layers.BatchNormalization()(reshaped);
+  reshaped = tf.keras.layers.ReLU()(reshaped);
   reshaped = tf.keras.layers.Conv2D(64, kernel_size = (3,3), padding = 'same')(reshaped);
   results = results = tf.keras.layers.Lambda(lambda x: tf.reshape(x[0], (-1, tf.shape(x[1])[1], tf.shape(x[1])[2], tf.shape(x[1])[3], x[0].shape[-1])))([reshaped, results]);
-  results = tf.keras.layers.BatchNormalization()(results);
+  # 3) sub-pixel upsampling x4 to get laplacian
   results = Unit(64, 16)(results);
   results = Unit(64 + 16 * 3, 16)(results);
   results = Unit(64 + 16 * 6, 16)(results);
@@ -122,9 +122,11 @@ def TGA():
   results = tf.keras.layers.Conv2D(128, kernel_size = (1,1), padding = 'same', activation = tf.keras.activations.relu)(results);
   results = tf.keras.layers.Conv2D(3 * 4, kernel_size = (1,1), padding = 'same')(results);
   laplacian = tf.keras.layers.Lambda(lambda x: tf.nn.depth_to_space(x, 2))(results); # results.shape = (batch, height * 2, width * 2, channels / 4)
+  # 4) bicubic upsampling the reference frames
   references = tf.keras.layers.Lambda(lambda x: x[:, 3, ...])(inputs); # references.shape = (batch, height, width, channels)
   gaussian = tf.keras.layers.Lambda(lambda x: tf.image.resize(x, (tf.shape(x)[1] * 4, tf.shape(x)[2] * 4), method = tf.image.ResizeMethod.BICUBIC))(references);
-  results = tf.keras.layers.Add()([laplacian, gaussian]);
+  # 5) combine to get the final super resolution images
+  results = tf.keras.layers.Add(name = 'hr')([laplacian, gaussian]);
   return tf.keras.Model(inputs = inputs, outputs = results);
 
 if __name__ == "__main__":

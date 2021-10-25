@@ -27,5 +27,25 @@ class Vimeo90k(object):
       if np.random.uniform() < 0.5:
         hr = [cv2.flip(img, 0) for img in hr];
       # 3) downsample
-      hr = np.array(hr); # hr.shape = (7, height, width, channel)
+      lr = list();
+      for hr_img in hr:
+        channels = list();
+        for c in range(3):
+          channels.append(cv2.pyrDown(cv2.pyrDown(hr_img[...,c])));
+        lr.append(np.concatenate(channels, axis = -1)); # lr_img.shape = (h/4,w/4,3)
+      lr = np.array(lr); # lr.shape = (7, h/4, w/4, 3)
+      yield lr.astype(np.float32), hr[3].astype(np.float32);
+  def parse_function(self, lr, hr):
+    lr = lr / 255.;
+    hr = hr / 255.;
+    return lr, {'hr': hr};
+  def load_datasets(self):
+    return tf.data.Dataset.from_generator(self.generator(), (tf.float32, tf.float32), (tf.TensorShape([7, None, None, 3]), tf.TensorShape([None, None, 3]))).map(self.parse_function);
+
+if __name__ == "__main__":
+  from sys import argv;
+  if len(argv) != 2:
+    print('Usage: %s <vimeo90k>');
+    exit();
+  dataset = Dataset(argv[1]);
 
