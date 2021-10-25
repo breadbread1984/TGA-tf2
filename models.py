@@ -67,7 +67,7 @@ def Fusion(in_channels, out_channels, is_last = False):
   return tf.keras.Model(inputs = inputs, outputs = block2_results);
 
 def TGA(scale = 2):
-  inputs = tf.keras.Input((8, None, None, 3)); # inputs.shape = (batch, length, height, width, channels)
+  inputs = tf.keras.Input((9, None, None, 3)); # inputs.shape = (batch, length, height, width, channels)
   reshaped = tf.keras.layers.Lambda(lambda x: tf.reshape(x, (-1, tf.shape(x)[-3], tf.shape(x)[-2], x.shape[-1])))(inputs); # reshaped.shape = (batch * length, height, width, channels)
   # 1) Intra-group Fusion
   # first part (2d unit x 3)
@@ -82,6 +82,7 @@ def TGA(scale = 2):
   results = tf.keras.layers.ReLU()(results);
   # second part (3d unit x 1)
   results = tf.keras.layers.Lambda(lambda x: tf.reshape(x[0], (-1, tf.shape(x[1])[1], tf.shape(x[1])[2], tf.shape(x[1])[3], x[0].shape[-1])))([results, inputs]); # results.shape = (batch, length, height, width, 64)
+  # NOTE: the following layer make length = length / 3
   results = tf.keras.layers.Conv3D(64, kernel_size = (3,3,3), strides = (3,1,1), padding = 'same')(results); # results.shape = (batch, length, height, width, 64)
   # 2) Inter-group Fusion
   results = Unit(64, 16)(results); # results.shape = (batch, length, height, width, 64 + 16 * 3)
@@ -91,6 +92,7 @@ def TGA(scale = 2):
   results = Unit(64 + 16 * 12, 16)(results);
   results = Unit(64 + 16 * 15, 16, is_last = True)(results);
   results = Fusion(64 + 16 * 18, 16)(results);
+  # NOTE: the following layer make length = length / 3
   results = Fusion(64 + 16 * 20, 16, is_last = True)(results);
   results = tf.keras.layers.BatchNormalization()(results);
   results = tf.keras.layers.ReLU()(results);
@@ -123,7 +125,7 @@ def TGA(scale = 2):
 if __name__ == "__main__":
   tga = TGA();
   import numpy as np;
-  inputs = np.random.normal(size = (4,8,10,10,3));
+  inputs = np.random.normal(size = (4,9,10,10,3));
   outputs = tga(inputs);
   print(inputs.shape);
   print(outputs.shape);
