@@ -42,6 +42,10 @@ def train():
     tga.compile(optimizer = optimizer,
                 loss = {'hr': tf.keras.losses.MeanAbsoluteError()},
                 metrics = [tf.keras.metrics.MeanAbsoluteError()]);
+  if FLAGS.save_model:
+    if not exists('models'): mkdir('models');
+    tga.save(join('models', 'tga.h5'));
+    tga.save_weights(join('models', 'tga_weights.h5'));
   trainset = Vimeo90k(FLAGS.vimeo_path).load_datasets().batch(FLAGS.batch_size);
   callbacks = [
     tf.keras.callbacks.TensorBoard(log_dir = 'checkpoints'),
