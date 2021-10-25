@@ -32,7 +32,7 @@ class Vimeo90k(object):
         channels = list();
         for c in range(3):
           channels.append(cv2.pyrDown(cv2.pyrDown(hr_img[...,c])));
-        lr.append(np.concatenate(channels, axis = -1)); # lr_img.shape = (h/4,w/4,3)
+        lr.append(np.stack(channels, axis = -1)); # lr_img.shape = (h/4,w/4,3)
       lr = np.array(lr); # lr.shape = (7, h/4, w/4, 3)
       yield lr.astype(np.float32), hr[3].astype(np.float32);
   def parse_function(self, lr, hr):
