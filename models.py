@@ -49,6 +49,7 @@ def Fusion(in_channels, out_channels, is_last = False):
   results = tf.keras.layers.ReLU()(results);
   results = tf.keras.layers.Conv3D(out_channels, kernel_size = (3,3,3), padding = 'same')(results);
   if is_last == True:
+    # NOTE: the following layer makes length = length - 2
     results = tf.keras.layers.Lambda(lambda x: x[:,1:-1,...])(results);
     sliced_inputs = tf.keras.layers.Lambda(lambda x: x[:,1:-1,...])(inputs); # results.shape = (batch, length - 1, height, width, channels)
   else:
@@ -92,7 +93,7 @@ def TGA(scale = 2):
   results = Unit(64 + 16 * 12, 16)(results);
   results = Unit(64 + 16 * 15, 16, is_last = True)(results);
   results = Fusion(64 + 16 * 18, 16)(results);
-  # NOTE: the following layer make length = length / 3
+  # NOTE: the following layer make length = length - 2
   results = Fusion(64 + 16 * 20, 16, is_last = True)(results);
   results = tf.keras.layers.BatchNormalization()(results);
   results = tf.keras.layers.ReLU()(results);
