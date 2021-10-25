@@ -18,7 +18,7 @@ class SummaryCallback(tf.keras.callbacks.Callback):
   def __init__(self, tga, eval_freq = 1000):
     self.tga = tga;
     self.eval_freq = eval_freq;
-    testset = Vimeo(FLAGS.vimeo_path).load_datasets().batch(1).repeat(-1);
+    testset = Vimeo90k(FLAGS.vimeo_path).load_datasets().batch(1).repeat(-1);
     self.iter = iter(testset);
     self.log = tf.summary.create_file_writer('checkpoints');
   def on_batch_end(self, batch, logs = None):
@@ -50,7 +50,7 @@ def train():
   callbacks = [
     tf.keras.callbacks.TensorBoard(log_dir = 'checkpoints'),
     tf.keras.callbacks.ModelCheckpoint(file_path = join('checkpoints', 'ckpt'), save_freq = 1000),
-
+    SummaryCallback(tga),
   ];
   tga.fit(trainset, epochs = 560, callbacks = callbacks);
   tga.save_weights('tga_weights.h5');
