@@ -24,3 +24,10 @@ save the trained model with the command
 python3 train.py --save_model
 ```
 
+## how to test saved model
+
+test the model with the command
+
+```shell
+python3 test.py
+```
