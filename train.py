@@ -13,6 +13,10 @@ def add_options():
   flags.DEFINE_integer('batch_size', default = 16, help = 'batch size');
   flags.DEFINE_string('vimeo_path', default = None, help = 'dataset path');
   flags.DEFINE_boolean('save_model', default = False, help = 'whether to save the trained model');
+  flags.DEFINE_integer('checkpoint_steps', default = 1000, help = 'how many steps for each checkpoint');
+  flags.DEFINE_integer('eval_steps', default = 1000, help = 'how many steps for each evaluation');
+  flags.DEFINE_integer('epochs', default = 560, help = 'epoch number');
+  flags.DEFINE_float('lr', default = 1e-3, help = 'learning rate');
 
 class SummaryCallback(tf.keras.callbacks.Callback):
   def __init__(self, tga, eval_freq = 1000):
@@ -38,7 +42,7 @@ def train():
     optimizer = tga.optimizer;
   else:
     tga = TGA();
-    optimizer = tf.keras.optimizers.Adam(tf.keras.optimizers.schedules.CosineDecay(1e-3, decay_steps = 100));
+    optimizer = tf.keras.optimizers.Adam(tf.keras.optimizers.schedules.CosineDecay(FLAGS.lr, decay_steps = 100));
     tga.compile(optimizer = optimizer,
                 loss = {'hr': tf.keras.losses.MeanAbsoluteError()},
                 metrics = [tf.keras.metrics.MeanAbsoluteError()]);
@@ -49,10 +53,10 @@ def train():
   trainset = Vimeo90k(FLAGS.vimeo_path).load_datasets().batch(FLAGS.batch_size);
   callbacks = [
     tf.keras.callbacks.TensorBoard(log_dir = 'checkpoints'),
-    tf.keras.callbacks.ModelCheckpoint(file_path = join('checkpoints', 'ckpt'), save_freq = 1000),
-    SummaryCallback(tga),
+    tf.keras.callbacks.ModelCheckpoint(file_path = join('checkpoints', 'ckpt'), save_freq = FLAGS.checkpoint_steps),
+    SummaryCallback(tga, FLAGS.eval_steps),
   ];
-  tga.fit(trainset, epochs = 560, callbacks = callbacks);
+  tga.fit(trainset, epochs = FLAGS.epochs, callbacks = callbacks);
   tga.save_weights('tga_weights.h5');
 
 def save_model():
