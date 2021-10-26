@@ -6,7 +6,7 @@ this project implements video super resolution algorithm TGA.
 
 ## prepare dataset
 
-download VIMEO90k dataset [here](http://data.csail.mit.edu/tofu/dataset/vimeo_triplet.zip)
+download VIMEO90k dataset [here](http://data.csail.mit.edu/tofu/dataset/vimeo_settuplet.zip)
 
 ## how to train
 
