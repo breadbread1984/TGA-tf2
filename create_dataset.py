@@ -40,7 +40,7 @@ class Vimeo90k(object):
     hr = hr / 255.;
     return lr, {'hr': hr};
   def load_datasets(self):
-    return tf.data.Dataset.from_generator(self.generator(), (tf.float32, tf.float32), (tf.TensorShape([7, None, None, 3]), tf.TensorShape([None, None, 3]))).map(self.parse_function);
+    return tf.data.Dataset.from_generator(self.generator, (tf.float32, tf.float32), (tf.TensorShape([7, None, None, 3]), tf.TensorShape([None, None, 3]))).map(self.parse_function);
 
 if __name__ == "__main__":
   from sys import argv;
