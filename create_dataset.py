@@ -9,7 +9,7 @@ class Vimeo90k(object):
   def __init__(self, root_dir):
     self.root_dir = root_dir;
     file_list = [line.rstrip() for line in open(join(root_dir, 'sep_trainlist.txt'))];
-    self.image_set_list = [join(root_dir, x) for x in file_list];
+    self.image_set_list = [join(root_dir, 'sequences', x) for x in file_list];
   def generator(self):
     for image_set in self.image_set_list:
       # 1) load images
