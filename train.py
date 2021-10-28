@@ -53,7 +53,7 @@ def train():
   trainset = Vimeo90k(FLAGS.vimeo_path).load_datasets().batch(FLAGS.batch_size);
   callbacks = [
     tf.keras.callbacks.TensorBoard(log_dir = 'checkpoints'),
-    tf.keras.callbacks.ModelCheckpoint(file_path = join('checkpoints', 'ckpt'), save_freq = FLAGS.checkpoint_steps),
+    tf.keras.callbacks.ModelCheckpoint(filepath = join('checkpoints', 'ckpt'), save_freq = FLAGS.checkpoint_steps),
     SummaryCallback(tga, FLAGS.eval_steps),
   ];
   tga.fit(trainset, epochs = FLAGS.epochs, callbacks = callbacks);
