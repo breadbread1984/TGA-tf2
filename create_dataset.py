@@ -27,7 +27,7 @@ class Vimeo90k(object):
       if np.random.uniform() < 0.5:
         hr = [cv2.flip(img, 0) for img in hr];
       # 3) downsample
-      lr = [cv2.resize(img, (w//4,w//4), interpolation = cv2.INTER_CUBIC) for img in hr];
+      lr = [cv2.resize(img, (w//4,h//4), interpolation = cv2.INTER_CUBIC) for img in hr];
       lr = np.array(lr); # lr.shape = (7, h/4, w/4, 3)
       yield lr.astype(np.float32), hr[3].astype(np.float32);
   def parse_function(self, lr, hr):
