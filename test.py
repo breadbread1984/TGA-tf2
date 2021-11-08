@@ -39,7 +39,7 @@ def main(unused_argv):
     sr = tf.squeeze(outputs * 255., axis = 0).numpy().astype(np.uint8);
     if FLAGS.show:
       cv2.imshow('sr', sr);
-      cv2.waitKey(1e3 / fr);
+      cv2.waitKey(int(1e3 / fr));
     writer.write(sr);
   video.release();
   writer.release();
