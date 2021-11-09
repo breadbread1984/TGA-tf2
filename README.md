@@ -16,7 +16,7 @@ train with command
 python3 train.py --vimeo_path=<viemo 9k path>
 ```
 
-a pretrained checkpoint can be download [here](https://pan.baidu.com/s/1kTF-IP_YjdrZZHkhlNeSNw), passcode is **qnqm**
+a pretrained model is under directory models
 
 ## how to save model
 
